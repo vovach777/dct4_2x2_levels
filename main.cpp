@@ -38,7 +38,7 @@ void idct4(int &a, int&b, int&c, int&d) {
 
 static void dct4f(int &a, int&b, int&c, int&d) {
 
-    float aa = (a + b + c + d)/4.0;
+    float aa = (a + b + c + d)/4.0f;
     float bb = a*_h + b*_l - c*_l - d*_h;
     float cc = a*_m - b*_m - c*_m + d*_m;
     float dd = a*_l - b*_h + c*_h - d*_l;
@@ -51,7 +51,7 @@ static void idct4f(int &a, int&b, int&c, int&d) {
     float bb = a*2.0f + b*_l - c*_m - d*_h;
     float cc = a*2.0f - b*_l - c*_m + d*_h;
     float dd = a*2.0f - b*_h + c*_m - d*_l; 
-    a = round(aa/2.0f); b = round(bb/2.0); c = round(cc/2.0); d = round(dd/2.0);
+    a = round(aa/2.0f); b = round(bb/2.0f); c = round(cc/2.0f); d = round(dd/2.0f);
 }
 
 
@@ -107,16 +107,6 @@ static T median(T a, T b, T c) {
    }
 }
 
-
-static int predict_coof(const the_matrix &m, int ax, int ay, int bsize)
-{
-    auto top  = get_m_value(m, ax, ay-bsize);
-    auto left = get_m_value(m, ax-bsize, ay);
-    auto topleft = get_m_value(m, ax-bsize, ay-bsize);
-    return median(top,left,top+left-topleft);
-}
-
-
 void transform(the_matrix & m, int levels) {
     const int height=m.size();
     const int width=m[0].size();
@@ -157,7 +147,7 @@ void transform(the_matrix & m, int levels) {
           //std::cout << std::endl << "r:"        << r  <<  " " << Lwidth << std::endl;
           //std::cout << std::endl;
         }
-        std::cout << "*** level " << level << " ***" << m;
+        //std::cout << "*** level " << level << " ***" << m;
     }
 }
 
