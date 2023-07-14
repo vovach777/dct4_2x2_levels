@@ -1,5 +1,6 @@
 //vovach777 (c) 2023
 //orinal work here:   https://godbolt.org/z/EabhKsqW1
+//update:  https://godbolt.org/z/fGMKvn5qe
 #include <iostream>
 #include <vector>
 #include <array>
