@@ -110,7 +110,6 @@ static T median(T a, T b, T c) {
 void transform(the_matrix & m, int levels) {
     const int height=m.size();
     const int width=m[0].size();
-    //auto predict_m = m;
     
     std::vector<std::array<int,3>> ring;
     std::array<int,3> top,left,topleft;
@@ -158,7 +157,6 @@ void inv_transform(the_matrix & m, int levels) {
     std::vector<std::array<int,3>> ring;
     std::array<int,3> top,left,topleft;
     //std::cout << width << "x" << height << std::endl;
-    auto m_copy = m;
     for (int level=levels; level>0; --level)
     {
         const int Lwidth = width >> level;
