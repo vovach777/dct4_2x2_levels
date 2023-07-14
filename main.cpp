@@ -6,52 +6,50 @@
 #include <cmath>
 #include <iomanip>
 #include <algorithm>
-#ifdef INT_DCT4
-void dct4(int &a, int&b, int&c, int&d) {
 
-    int aa = (a + b + c + d)/4;
-    int bb = a + b*2/5 - c*2/5 - d;
-    int cc = a*3/4 - b*3/4 - c*3/4 + d*3/4;
-    int dd = a*2/5 - b + c - d*2/5;
-    a = aa; b = bb; c = cc; d = dd;
+
+
+constexpr float _m = 0.707107f;
+
+
+static void dct(float &a, float&b) {
+
+    float aa = (a + b)/2.0f;
+    float bb = a*_m - b*_m;
+    a = aa; b = bb;
 }
 
-void idct4(int &a, int&b, int&c, int&d) {
+static void inv_dct(float &a, float&b) {
 
-    int aa = a*2 + b + c*3/4 + d*2/5;
-    int bb = a*2 + b*2/5 - c*3/4 - d;
-    int cc = a*2 - b*2/5 - c*3/4 + d;
-    int dd = a*2 - b + c*3/4 - d*2/5; 
-    a = aa/2; b = bb/2; c = cc/2; d = dd/2;
-}
-#endif
-
-/*
-0.92388 0.382683 -0.382683 -0.92388 
-0.707107 -0.707107 -0.707107 0.707107 
-0.382683 -0.92388 0.92388 -0.382683 
-*/
-
-    constexpr float _h = 0.92388f;
-    constexpr float _m = 0.707107f;
-    constexpr float _l = 0.382683f;
-
-static void dct4f(int &a, int&b, int&c, int&d) {
-
-    float aa = (a + b + c + d)/4.0f;
-    float bb = a*_h + b*_l - c*_l - d*_h;
-    float cc = a*_m - b*_m - c*_m + d*_m;
-    float dd = a*_l - b*_h + c*_h - d*_l;
-    a = round(aa); b = round(bb); c = round(cc); d = round(dd);
+    float aa = a + b*_m;
+    float bb = a - b*_m;
+    a = aa; b = bb;
 }
 
-static void idct4f(int &a, int&b, int&c, int&d) {
+static void dct(int &a, int &b, int &c, int &d)
+{
+    float a_=a,b_=b,c_=c,d_=d;
+	dct(a_,b_);
+	dct(c_,d_);
+	dct(a_,c_);
+	dct(b_,d_);
+    a = roundf(a_);
+    b = roundf(b_);
+    c = roundf(c_);
+    d = roundf(d_);
+}
 
-    float aa = a*2.0f + b*_h + c*_m + d*_l;
-    float bb = a*2.0f + b*_l - c*_m - d*_h;
-    float cc = a*2.0f - b*_l - c*_m + d*_h;
-    float dd = a*2.0f - b*_h + c*_m - d*_l; 
-    a = round(aa/2.0f); b = round(bb/2.0f); c = round(cc/2.0f); d = round(dd/2.0f);
+static void inv_dct(int &a, int &b, int &c, int &d)
+{
+    float a_=a,b_=b,c_=c,d_=d;
+	inv_dct(a_,c_);
+	inv_dct(b_,d_);
+	inv_dct(a_,b_);
+	inv_dct(c_,d_);
+    a = roundf(a_);
+    b = roundf(b_);
+    c = roundf(c_);
+    d = roundf(d_);
 }
 
 
@@ -83,14 +81,6 @@ the_matrix make_sample(int size) {
         //data[i] = i % 8;
     }
     return std::move(data);
-}
-
-static int get_m_value(const the_matrix &m, int x, int y)
-{
-    if ( x < 0 || x >= m[0].size() || y < 0 || y >= m.size())
-        return 0;
-    else
-        return m[y][x];
 }
 
 
@@ -132,7 +122,7 @@ void transform(the_matrix & m, int levels) {
             auto& b = m[h][x+step];
             auto& c = m[h+step][x];
             auto& d = m[h+step][x+step];
-            dct4f( m[h][x], b, c, d);
+            dct( m[h][x], b, c, d);
             ring[r % modR] = std::array<int,3>{b,c,d};
             top   = h ? ring[(r - Lwidth) % modR ] : std::array<int,3>{0,0,0};
             left  = x ? ring[(r - 1 )  % modR ] : std::array<int,3>{0,0,0};
@@ -183,7 +173,7 @@ void inv_transform(the_matrix & m, int levels) {
 
                 ring[r % modR] = std::array<int,3>{b,c,d};
 
-                idct4f( m[h][x], b, c, d);
+                inv_dct( m[h][x], b, c, d);
                 
                 //std::cout << ",   " << (r-modR) << "=" << x;
             }
