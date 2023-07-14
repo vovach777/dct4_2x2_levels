@@ -9,7 +9,7 @@
 
 
 
-constexpr float _m = 0.707107f;
+static const float _m = cosf(M_PI/4);
 
 
 static void dct(float &a, float&b) {
